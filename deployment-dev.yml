@@ -16,7 +16,7 @@
           spec:
             selector:
               name: pipelines-vote-ui-dev
-            template: 
+            template:
               metadata:
                 labels:
                   name: "pipelines-vote-ui-dev"
@@ -36,11 +36,11 @@
                       - name: VOTING_API_SERVICE_PORT
                         value: "9000"
             replicas: 1
-            strategy: 
+            strategy:
               type: "Rolling"
-            paused: false 
-            revisionHistoryLimit: 2 
-            minReadySeconds: 0 
+            paused: false
+            revisionHistoryLimit: 2
+            minReadySeconds: 0
 
         wait: yes
       register: vote_ui_dev_deployment
@@ -52,6 +52,6 @@
     - name: Log Deployment Details
       debug:
         msg: "{{ item | json_query('metadata.name') }}"
-      loop: '{{funstuff_deployments_list.resources}}'
+      loop: "{{funstuff_deployments_list.resources}}"
       loop_control:
         label: "Deployment (Namespace: {{item | json_query('metadata.namespace')}},Replicas:{{ item | json_query('spec.replicas')}})"

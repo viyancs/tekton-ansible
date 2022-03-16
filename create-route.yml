@@ -1,0 +1,35 @@
+- hosts: localhost
+  connection: local
+  collections:
+    - community.kubernetes
+  tasks:
+    - name: Create a new Route
+      k8s:
+        state: present
+        resource_definition: |
+          apiVersion: route.openshift.io/v1
+          kind: Route
+          metadata:
+            labels:
+              app: helloworld
+            name: helloworld
+          spec:
+            port:
+              targetPort: 8080-tcp
+            to:
+              kind: Service
+              name: helloworld
+              weight: 100
+        wait: yes
+      register: helloworld_route
+    - name: Get the Route
+      k8s_info:
+        kind: Route
+        namespace: pipeline-tutorial
+      register: funstuff_route_list
+    - name: Log Route Details
+      debug:
+        msg: "{{ item | json_query('metadata.name') }}"
+      loop: '{{funstuff_route_list.resources}}'
+      loop_control:
+        label: "Route (Namespace: {{item | json_query('metadata.namespace')}})"

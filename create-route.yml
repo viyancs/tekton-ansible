@@ -7,19 +7,20 @@
       k8s:
         state: present
         resource_definition: |
-          apiVersion: v1
           kind: Route
+          apiVersion: route.openshift.io/v1
           metadata:
-            labels:
-              app: helloworld
             name: helloworld
+            namespace: pipeline-tutorial
           spec:
-            port:
-              targetPort: 8080-tcp
+            host: helloworld-pipeline-tutorial.apps.devocpcluster.imdevocplab.com
             to:
               kind: Service
               name: helloworld
               weight: 100
+            port:
+              targetPort: 8080
+            wildcardPolicy: None
         wait: yes
       register: helloworld_route
     - name: Get the Route

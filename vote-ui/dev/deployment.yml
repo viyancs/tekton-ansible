@@ -37,12 +37,7 @@
                       value: dev-vote-api
                     - name: VOTING_API_SERVICE_PORT
                       value: "9000"
-            replicas: 1
-            strategy:
-              type: "Rolling"
-            paused: false
-            revisionHistoryLimit: 2
-            minReadySeconds: 0
+            
         wait: yes
       register: deployment
     - name: Get the Deployment

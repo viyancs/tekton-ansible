@@ -1,0 +1,22 @@
+apiVersion: polling.tekton.dev/v1alpha1
+kind: Repository
+metadata:
+  name: dev-vote-ui
+spec:
+  url: https://github.com/viyancs/pipelines-vote-ui.git
+  ref: dev
+  frequency: 1m
+  type: github # can also be gitlab
+  pipelineRef:
+    name: dev-pipeline-vote-ui
+    workspaces:
+      - name: shared-workspace
+        volumeClaimTemplate:
+          spec:
+            accessModes:
+              - ReadWriteOnce
+            storageClassName: thin
+            resources:
+              requests:
+                storage: 500Mi
+        

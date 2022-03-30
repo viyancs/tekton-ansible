@@ -8,7 +8,7 @@
         state: present
         resource_definition: |
           apiVersion: apps/v1
-          kind: DeploymentConfig
+          kind: Deployment
           metadata:
             labels:
               app: dev-vote-ui

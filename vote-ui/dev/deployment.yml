@@ -1,0 +1,52 @@
+- hosts: localhost
+  connection: local
+  collections:
+    - community.kubernetes
+  tasks:
+    - name: Create a new deployment
+      k8s:
+        state: present
+        resource_definition: |
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            labels:
+              app: dev-vote-ui
+            name: dev-vote-ui
+            namespace: pipeline-tutorial
+          spec:
+            selector:
+              matchLabels:
+                app: dev-vote-ui
+            template:
+              metadata:
+                labels:
+                  app: dev-vote-ui
+              spec:
+                containers:
+                - name: dev-vote-ui
+                  image: image-registry.openshift-image-registry.svc:5000/pipeline-tutorial/dev-vote-ui
+                  imagePullPolicy: Always
+                  ports:
+                    - containerPort: 8080
+                      protocol: TCP
+                    - containerPort: 9090
+                      protocol: TCP
+                  env:
+                    - name: VOTING_API_SERVICE_HOST
+                      value: dev-vote-api
+                    - name: VOTING_API_SERVICE_PORT
+                      value: "9000"
+        wait: yes
+      register: deployment
+    - name: Get the Deployment
+      k8s_info:
+        kind: Deployment
+        namespace: pipeline-tutorial
+      register: deployments_list
+    - name: Log Deployment Details
+      debug:
+        msg: "{{ item | json_query('metadata.name') }}"
+      loop: '{{deployments_list.resources}}'
+      loop_control:
+        label: "Deployment (Namespace: {{item | json_query('metadata.namespace')}},Replicas:{{ item | json_query('spec.replicas')}})"

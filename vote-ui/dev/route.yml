@@ -23,7 +23,7 @@
             port:
               targetPort: 8080-tcp
         wait: yes
-      register: dev-vote-ui_route
+      register: dev_vote_ui_route
     - name: Get the Route
       k8s_info:
         kind: Route

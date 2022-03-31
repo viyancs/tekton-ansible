@@ -1,0 +1,37 @@
+- hosts: localhost
+  connection: local
+  collections:
+    - community.kubernetes
+  tasks:
+    - name: Create a new Route
+      k8s:
+        state: present
+        resource_definition: |
+          kind: Route
+          apiVersion: route.openshift.io/v1
+          metadata:
+            labels:
+              app: uat-vote-ui
+            name: uat-vote-ui
+            namespace: pipeline-tutorial
+          spec:
+            host: uat-vote-ui-pipeline-tutorial.apps.devocpcluster.imdevocplab.com
+            to:
+              kind: Service
+              name: uat-vote-ui
+              weight: 100
+            port:
+              targetPort: 8080-tcp
+        wait: yes
+      register: uat_vote_ui_route
+    - name: Get the Route
+      k8s_info:
+        kind: Route
+        namespace: pipeline-tutorial
+      register: route
+    - name: Log Route Details
+      debug:
+        msg: "{{ item | json_query('metadata.name') }}"
+      loop: '{{route.resources}}'
+      loop_control:
+        label: "Route (Namespace: {{item | json_query('metadata.namespace')}})"

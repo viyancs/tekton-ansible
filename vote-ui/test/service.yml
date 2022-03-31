@@ -1,0 +1,38 @@
+- hosts: localhost
+  connection: local
+  collections:
+    - community.kubernetes
+  tasks:
+    - name: Create a new Service
+      k8s:
+        state: present
+        resource_definition: |
+          apiVersion: v1
+          kind: Service
+          metadata:
+            labels:
+              app: test-vote-ui
+            name: test-vote-ui
+            namespace: pipeline-tutorial
+          spec:
+            type: NodePort
+            selector:
+              app: test-vote-ui
+            ports:
+              - name: 8080-tcp
+                port: 8080
+                targetPort: 8080
+                protocol: TCP
+        wait: yes
+      register: dev_vote_ui_svc
+    - name: Get the Service
+      k8s_info:
+        kind: Service
+        namespace: pipeline-tutorial
+      register: service_list
+    - name: Log Service Details
+      debug:
+        msg: "{{ item | json_query('metadata.name') }}"
+      loop: '{{service_list.resources}}'
+      loop_control:
+        label: "Service (Namespace: {{item | json_query('metadata.namespace')}})"
